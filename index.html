@@ -122,15 +122,18 @@
   </div>
 
   <div class="section">
-    <h2>Cost Per Rental</h2>
+    <h2>Your Pay (Owner/Operator)</h2>
     
-    <div class="cost-category">Personnel Costs</div>
-    <label for="driverTime">Driver Time ($)</label>
+    <label for="driverTime">Driver Time Pay ($)</label>
     <input type="number" id="driverTime" min="0" value="60.00" step="0.01" />
     
-    <label for="officeTime">Office Time ($)</label>
+    <label for="officeTime">Office Time Pay ($)</label>
     <input type="number" id="officeTime" min="0" value="10.00" step="0.01" />
+  </div>
 
+  <div class="section">
+    <h2>Business Operating Costs Per Rental</h2>
+    
     <div class="cost-category">Equipment Maintenance</div>
     <label for="truckMaintenance">Truck Maintenance ($)</label>
     <input type="number" id="truckMaintenance" min="0" value="10.15" step="0.01" />
@@ -180,11 +183,12 @@
       <span class="highlight">$<span id="totalRevenue">0</span></span>
     </div>
     
-    <div class="cost-category">Cost Breakdown (Monthly)</div>
     <div class="output-item">
-      <span>Personnel Costs:</span>
-      <span>$<span id="totalPersonnel">0</span></span>
+      <span>Your Monthly Pay (Driver + Office):</span>
+      <span class="highlight">$<span id="monthlyPay">0</span></span>
     </div>
+    
+    <div class="cost-category">Business Operating Costs (Monthly)</div>
     
     <div class="output-item">
       <span>Equipment Maintenance:</span>
@@ -217,13 +221,18 @@
     </div>
     
     <div class="output-item profit-highlight">
-      <span><strong>Your Monthly Profit (After All Costs):</strong></span>
+      <span><strong>Additional Business Profit (After Pay & Costs):</strong></span>
       <span class="highlight">$<span id="netProfit">0</span></span>
     </div>
     
+    <div class="output-item profit-highlight">
+      <span><strong>Your Total Monthly Income:</strong></span>
+      <span class="highlight">$<span id="totalIncome">0</span></span>
+    </div>
+    
     <div class="output-item">
-      <span>Your Profit Per Rental:</span>
-      <span class="highlight">$<span id="profitPerRental">0</span></span>
+      <span>Your Income Per Rental:</span>
+      <span class="highlight">$<span id="incomePerRental">0</span></span>
     </div>
   </div>
 
@@ -251,7 +260,7 @@
   const outputs = {
     avgRevenue: document.getElementById('avgRevenue'),
     totalRevenue: document.getElementById('totalRevenue'),
-    totalPersonnel: document.getElementById('totalPersonnel'),
+    monthlyPay: document.getElementById('monthlyPay'),
     totalMaintenance: document.getElementById('totalMaintenance'),
     totalMaterial: document.getElementById('totalMaterial'),
     totalStartup: document.getElementById('totalStartup'),
@@ -259,7 +268,8 @@
     totalOther: document.getElementById('totalOther'),
     totalCosts: document.getElementById('totalCosts'),
     netProfit: document.getElementById('netProfit'),
-    profitPerRental: document.getElementById('profitPerRental')
+    totalIncome: document.getElementById('totalIncome'),
+    incomePerRental: document.getElementById('incomePerRental')
   };
 
   function calculate() {
@@ -272,8 +282,10 @@
     const extraDayRate = 15;
     const revenuePerRental = basePrice + (extraDays * extraDayRate);
     
-    // Calculate all costs per rental (including personnel - these are your operating costs)
-    const personnelCosts = Number(inputs.driverTime.value) + Number(inputs.officeTime.value);
+    // Your pay as owner/operator (this goes to you)
+    const ownerPay = Number(inputs.driverTime.value) + Number(inputs.officeTime.value);
+    
+    // Calculate business operating costs per rental
     const maintenanceCosts = Number(inputs.truckMaintenance.value) + Number(inputs.trailerMaintenance.value);
     const materialCosts = Number(inputs.fuel.value);
     const startupCosts = Number(inputs.truckPayback.value) + Number(inputs.trailerPayback.value);
@@ -281,39 +293,51 @@
                        Number(inputs.godaddy.value) + Number(inputs.quickbooks.value);
     const otherCosts = Number(inputs.storage.value) + Number(inputs.tonnageAllowance.value);
     
-    const totalCostPerRental = personnelCosts + maintenanceCosts + materialCosts + 
-                              startupCosts + onlineCosts + otherCosts;
+    const businessCostsPerRental = maintenanceCosts + materialCosts + startupCosts + onlineCosts + otherCosts;
     
-    // Calculate YOUR PROFIT (revenue minus all costs)
-    const profitPerRental = revenuePerRental - totalCostPerRental;
+    // Calculate profits
+    const additionalProfitPerRental = revenuePerRental - ownerPay - businessCostsPerRental;
+    const totalIncomePerRental = ownerPay + additionalProfitPerRental;
     
     // Calculate monthly totals
     const totalRevenue = rentals * revenuePerRental;
-    const totalPersonnelMonthly = rentals * personnelCosts;
+    const monthlyPay = rentals * ownerPay;
     const totalMaintenanceMonthly = rentals * maintenanceCosts;
     const totalMaterialMonthly = rentals * materialCosts;
     const totalStartupMonthly = rentals * startupCosts;
     const totalOnlineMonthly = rentals * onlineCosts;
     const totalOtherMonthly = rentals * otherCosts;
-    const totalCosts = rentals * totalCostPerRental;
-    const monthlyProfit = rentals * profitPerRental;
+    const totalBusinessCosts = rentals * businessCostsPerRental;
+    const additionalMonthlyProfit = rentals * additionalProfitPerRental;
+    const totalMonthlyIncome = monthlyPay + additionalMonthlyProfit;
 
     // Update displays
     outputs.avgRevenue.textContent = revenuePerRental.toFixed(2);
     outputs.totalRevenue.textContent = totalRevenue.toFixed(2);
-    outputs.totalPersonnel.textContent = totalPersonnelMonthly.toFixed(2);
+    outputs.monthlyPay.textContent = monthlyPay.toFixed(2);
     outputs.totalMaintenance.textContent = totalMaintenanceMonthly.toFixed(2);
     outputs.totalMaterial.textContent = totalMaterialMonthly.toFixed(2);
     outputs.totalStartup.textContent = totalStartupMonthly.toFixed(2);
     outputs.totalOnline.textContent = totalOnlineMonthly.toFixed(2);
     outputs.totalOther.textContent = totalOtherMonthly.toFixed(2);
-    outputs.totalCosts.textContent = totalCosts.toFixed(2);
-    outputs.netProfit.textContent = monthlyProfit.toFixed(2);
-    outputs.profitPerRental.textContent = profitPerRental.toFixed(2);
+    outputs.totalCosts.textContent = totalBusinessCosts.toFixed(2);
+    outputs.netProfit.textContent = additionalMonthlyProfit.toFixed(2);
+    outputs.totalIncome.textContent = totalMonthlyIncome.toFixed(2);
+    outputs.incomePerRental.textContent = totalIncomePerRental.toFixed(2);
     
-    // Color code profit
+    // Color code total income
+    const incomeElement = outputs.totalIncome.parentElement;
     const profitElement = outputs.netProfit.parentElement;
-    if (monthlyProfit > 0) {
+    
+    if (totalMonthlyIncome > 0) {
+      incomeElement.style.backgroundColor = '#d4edda';
+      incomeElement.style.borderColor = '#28a745';
+    } else {
+      incomeElement.style.backgroundColor = '#f8d7da';
+      incomeElement.style.borderColor = '#dc3545';
+    }
+    
+    if (additionalMonthlyProfit > 0) {
       profitElement.style.backgroundColor = '#d4edda';
       profitElement.style.borderColor = '#28a745';
     } else {
