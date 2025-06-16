@@ -7,7 +7,7 @@
 <style>
   body {
     font-family: Arial, sans-serif;
-    max-width: 600px;
+    max-width: 800px;
     margin: 2rem auto;
     padding: 1rem;
     background: #f8f9fa;
@@ -16,88 +16,316 @@
   h1 {
     text-align: center;
     color: #004085;
+    margin-bottom: 2rem;
+  }
+  .section {
+    background: white;
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .section h2 {
+    color: #004085;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
   }
   label {
     font-weight: bold;
     display: block;
     margin-top: 1rem;
+    margin-bottom: 0.3rem;
   }
   input[type="number"] {
     width: 100%;
-    padding: 0.4rem;
-    margin-top: 0.3rem;
+    padding: 0.5rem;
     font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  .cost-breakdown {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  .cost-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+    background: #f8f9fa;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+  }
+  .cost-category {
+    font-weight: bold;
+    color: #004085;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 2px solid #004085;
+    padding-bottom: 0.3rem;
   }
   .output {
-    background: #e9ecef;
+    background: #e8f5e8;
     margin-top: 1.5rem;
-    padding: 1rem;
-    border-radius: 6px;
+    padding: 1.5rem;
+    border-radius: 8px;
     font-size: 1.1rem;
+    border: 2px solid #28a745;
   }
-  .output div {
-    margin-bottom: 0.6rem;
+  .output h2 {
+    color: #155724;
+    margin-top: 0;
+  }
+  .output-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.8rem;
+    padding: 0.5rem;
+    background: white;
+    border-radius: 4px;
   }
   .highlight {
     font-weight: bold;
     color: #155724;
+    font-size: 1.2rem;
+  }
+  .profit-highlight {
+    background: #d4edda;
+    border: 2px solid #28a745;
+    font-size: 1.3rem;
   }
 </style>
 </head>
 <body>
   <h1>Dumpster Rental Profit Calculator</h1>
+  
+  <div class="section">
+    <h2>Basic Information</h2>
+    <label for="rentals">Number of Rentals per Month</label>
+    <input type="number" id="rentals" min="0" value="20" />
+    
+    <label for="avgDays">Average Days per Rental</label>
+    <input type="number" id="avgDays" min="3" value="5" step="0.1" />
+    
+    <div class="cost-item" style="margin-top: 1rem;">
+      <span>Base Price (3 days): $300</span>
+      <span>Extra Days: $15/day</span>
+    </div>
+    
+    <div class="cost-item">
+      <span>Average Revenue per Rental:</span>
+      <span class="highlight">$<span id="avgRevenue">330</span></span>
+    </div>
+  </div>
 
-  <label for="rentals">Number of Rentals per Month</label>
-  <input type="number" id="rentals" min="0" value="20" />
+  <div class="section">
+    <h2>Cost Per Rental</h2>
+    
+    <div class="cost-category">Personnel Costs</div>
+    <label for="driverTime">Driver Time ($)</label>
+    <input type="number" id="driverTime" min="0" value="60.00" step="0.01" />
+    
+    <label for="officeTime">Office Time ($)</label>
+    <input type="number" id="officeTime" min="0" value="10.00" step="0.01" />
 
-  <label for="price">Price per Rental ($)</label>
-  <input type="number" id="price" min="0" value="281" step="0.01" />
+    <div class="cost-category">Equipment Maintenance</div>
+    <label for="truckMaintenance">Truck Maintenance ($)</label>
+    <input type="number" id="truckMaintenance" min="0" value="10.15" step="0.01" />
+    
+    <label for="trailerMaintenance">Trailer Maintenance ($)</label>
+    <input type="number" id="trailerMaintenance" min="0" value="10.75" step="0.01" />
 
-  <label for="ownerDraw">Owner’s Draw per Rental ($)</label>
-  <input type="number" id="ownerDraw" min="0" value="70" step="0.01" />
+    <div class="cost-category">Material Costs</div>
+    <label for="fuel">Fuel ($)</label>
+    <input type="number" id="fuel" min="0" value="19.50" step="0.01" />
 
-  <label for="businessProfit">Business Profit per Rental ($)</label>
-  <input type="number" id="businessProfit" min="0" value="20" step="0.01" />
+    <div class="cost-category">Startup Costs (Amortized)</div>
+    <label for="truckPayback">Truck Payback ($)</label>
+    <input type="number" id="truckPayback" min="0" value="10.00" step="0.01" />
+    
+    <label for="trailerPayback">Trailer/Dumpster Payback ($)</label>
+    <input type="number" id="trailerPayback" min="0" value="22.00" step="0.01" />
+
+    <div class="cost-category">Online Costs</div>
+    <label for="commercialAuto">Commercial Auto Insurance ($)</label>
+    <input type="number" id="commercialAuto" min="0" value="28.00" step="0.01" />
+    
+    <label for="generalLiability">General Liability Insurance ($)</label>
+    <input type="number" id="generalLiability" min="0" value="4.50" step="0.01" />
+    
+    <label for="godaddy">GoDaddy ($)</label>
+    <input type="number" id="godaddy" min="0" value="1.00" step="0.01" />
+    
+    <label for="quickbooks">Quickbooks ($)</label>
+    <input type="number" id="quickbooks" min="0" value="1.00" step="0.01" />
+
+    <div class="cost-category">Other Costs</div>
+    <label for="storage">Storage ($)</label>
+    <input type="number" id="storage" min="0" value="5.00" step="0.01" />
+    
+
+    
+    <label for="tonnageAllowance">Tonnage Allowance ($)</label>
+    <input type="number" id="tonnageAllowance" min="0" value="80.00" step="0.01" />
+  </div>
 
   <div class="output" id="results">
-    <div>Total Revenue: $<span id="totalRevenue">0</span></div>
-    <div>Total Owner’s Draw: $<span id="totalOwnerDraw">0</span></div>
-    <div>Total Business Profit: $<span id="totalBusinessProfit">0</span></div>
-    <div>Total Operating Costs: $<span id="totalCosts">0</span></div>
+    <h2>Monthly Projections</h2>
+    
+    <div class="output-item">
+      <span>Total Monthly Revenue:</span>
+      <span class="highlight">$<span id="totalRevenue">0</span></span>
+    </div>
+    
+    <div class="cost-category">Cost Breakdown (Monthly)</div>
+    <div class="output-item">
+      <span>Personnel Costs:</span>
+      <span>$<span id="totalPersonnel">0</span></span>
+    </div>
+    
+    <div class="output-item">
+      <span>Equipment Maintenance:</span>
+      <span>$<span id="totalMaintenance">0</span></span>
+    </div>
+    
+    <div class="output-item">
+      <span>Material Costs (Fuel):</span>
+      <span>$<span id="totalMaterial">0</span></span>
+    </div>
+    
+    <div class="output-item">
+      <span>Startup Cost Recovery:</span>
+      <span>$<span id="totalStartup">0</span></span>
+    </div>
+    
+    <div class="output-item">
+      <span>Online/Insurance Costs:</span>
+      <span>$<span id="totalOnline">0</span></span>
+    </div>
+    
+    <div class="output-item">
+      <span>Other Costs:</span>
+      <span>$<span id="totalOther">0</span></span>
+    </div>
+    
+    <div class="output-item">
+      <span><strong>Total Operating Costs:</strong></span>
+      <span class="highlight">$<span id="totalCosts">0</span></span>
+    </div>
+    
+    <div class="output-item profit-highlight">
+      <span><strong>Your Monthly Profit (After All Costs):</strong></span>
+      <span class="highlight">$<span id="netProfit">0</span></span>
+    </div>
+    
+    <div class="output-item">
+      <span>Your Profit Per Rental:</span>
+      <span class="highlight">$<span id="profitPerRental">0</span></span>
+    </div>
   </div>
 
 <script>
-  const rentalsInput = document.getElementById('rentals');
-  const priceInput = document.getElementById('price');
-  const ownerDrawInput = document.getElementById('ownerDraw');
-  const businessProfitInput = document.getElementById('businessProfit');
+  // Get all input elements
+  const inputs = {
+    rentals: document.getElementById('rentals'),
+    avgDays: document.getElementById('avgDays'),
+    driverTime: document.getElementById('driverTime'),
+    officeTime: document.getElementById('officeTime'),
+    truckMaintenance: document.getElementById('truckMaintenance'),
+    trailerMaintenance: document.getElementById('trailerMaintenance'),
+    fuel: document.getElementById('fuel'),
+    truckPayback: document.getElementById('truckPayback'),
+    trailerPayback: document.getElementById('trailerPayback'),
+    commercialAuto: document.getElementById('commercialAuto'),
+    generalLiability: document.getElementById('generalLiability'),
+    godaddy: document.getElementById('godaddy'),
+    quickbooks: document.getElementById('quickbooks'),
+    storage: document.getElementById('storage'),
+    tonnageAllowance: document.getElementById('tonnageAllowance')
+  };
 
-  const totalRevenueEl = document.getElementById('totalRevenue');
-  const totalOwnerDrawEl = document.getElementById('totalOwnerDraw');
-  const totalBusinessProfitEl = document.getElementById('totalBusinessProfit');
-  const totalCostsEl = document.getElementById('totalCosts');
+  // Get output elements
+  const outputs = {
+    avgRevenue: document.getElementById('avgRevenue'),
+    totalRevenue: document.getElementById('totalRevenue'),
+    totalPersonnel: document.getElementById('totalPersonnel'),
+    totalMaintenance: document.getElementById('totalMaintenance'),
+    totalMaterial: document.getElementById('totalMaterial'),
+    totalStartup: document.getElementById('totalStartup'),
+    totalOnline: document.getElementById('totalOnline'),
+    totalOther: document.getElementById('totalOther'),
+    totalCosts: document.getElementById('totalCosts'),
+    netProfit: document.getElementById('netProfit'),
+    profitPerRental: document.getElementById('profitPerRental')
+  };
 
   function calculate() {
-    const rentals = Number(rentalsInput.value);
-    const price = Number(priceInput.value);
-    const ownerDraw = Number(ownerDrawInput.value);
-    const businessProfit = Number(businessProfitInput.value);
+    const rentals = Number(inputs.rentals.value) || 0;
+    const avgDays = Number(inputs.avgDays.value) || 3;
+    
+    // Calculate revenue per rental based on pricing structure
+    const basePrice = 300; // 3 days
+    const extraDays = Math.max(0, avgDays - 3);
+    const extraDayRate = 15;
+    const revenuePerRental = basePrice + (extraDays * extraDayRate);
+    
+    // Calculate all costs per rental (including personnel - these are your operating costs)
+    const personnelCosts = Number(inputs.driverTime.value) + Number(inputs.officeTime.value);
+    const maintenanceCosts = Number(inputs.truckMaintenance.value) + Number(inputs.trailerMaintenance.value);
+    const materialCosts = Number(inputs.fuel.value);
+    const startupCosts = Number(inputs.truckPayback.value) + Number(inputs.trailerPayback.value);
+    const onlineCosts = Number(inputs.commercialAuto.value) + Number(inputs.generalLiability.value) + 
+                       Number(inputs.godaddy.value) + Number(inputs.quickbooks.value);
+    const otherCosts = Number(inputs.storage.value) + Number(inputs.tonnageAllowance.value);
+    
+    const totalCostPerRental = personnelCosts + maintenanceCosts + materialCosts + 
+                              startupCosts + onlineCosts + otherCosts;
+    
+    // Calculate YOUR PROFIT (revenue minus all costs)
+    const profitPerRental = revenuePerRental - totalCostPerRental;
+    
+    // Calculate monthly totals
+    const totalRevenue = rentals * revenuePerRental;
+    const totalPersonnelMonthly = rentals * personnelCosts;
+    const totalMaintenanceMonthly = rentals * maintenanceCosts;
+    const totalMaterialMonthly = rentals * materialCosts;
+    const totalStartupMonthly = rentals * startupCosts;
+    const totalOnlineMonthly = rentals * onlineCosts;
+    const totalOtherMonthly = rentals * otherCosts;
+    const totalCosts = rentals * totalCostPerRental;
+    const monthlyProfit = rentals * profitPerRental;
 
-    const totalRevenue = rentals * price;
-    const totalOwnerDraw = rentals * ownerDraw;
-    const totalBusinessProfit = rentals * businessProfit;
-    const totalCosts = totalRevenue - totalOwnerDraw - totalBusinessProfit;
-
-    totalRevenueEl.textContent = totalRevenue.toFixed(2);
-    totalOwnerDrawEl.textContent = totalOwnerDraw.toFixed(2);
-    totalBusinessProfitEl.textContent = totalBusinessProfit.toFixed(2);
-    totalCostsEl.textContent = totalCosts.toFixed(2);
+    // Update displays
+    outputs.avgRevenue.textContent = revenuePerRental.toFixed(2);
+    outputs.totalRevenue.textContent = totalRevenue.toFixed(2);
+    outputs.totalPersonnel.textContent = totalPersonnelMonthly.toFixed(2);
+    outputs.totalMaintenance.textContent = totalMaintenanceMonthly.toFixed(2);
+    outputs.totalMaterial.textContent = totalMaterialMonthly.toFixed(2);
+    outputs.totalStartup.textContent = totalStartupMonthly.toFixed(2);
+    outputs.totalOnline.textContent = totalOnlineMonthly.toFixed(2);
+    outputs.totalOther.textContent = totalOtherMonthly.toFixed(2);
+    outputs.totalCosts.textContent = totalCosts.toFixed(2);
+    outputs.netProfit.textContent = monthlyProfit.toFixed(2);
+    outputs.profitPerRental.textContent = profitPerRental.toFixed(2);
+    
+    // Color code profit
+    const profitElement = outputs.netProfit.parentElement;
+    if (monthlyProfit > 0) {
+      profitElement.style.backgroundColor = '#d4edda';
+      profitElement.style.borderColor = '#28a745';
+    } else {
+      profitElement.style.backgroundColor = '#f8d7da';
+      profitElement.style.borderColor = '#dc3545';
+    }
   }
 
-  rentalsInput.addEventListener('input', calculate);
-  priceInput.addEventListener('input', calculate);
-  ownerDrawInput.addEventListener('input', calculate);
-  businessProfitInput.addEventListener('input', calculate);
+  // Add event listeners to all inputs
+  Object.values(inputs).forEach(input => {
+    input.addEventListener('input', calculate);
+  });
 
   // Initial calculation
   calculate();
