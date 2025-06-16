@@ -1,63 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Dumpster Rental Profit Calculator</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; background-color: #f9f9f9; }
-    h1 { font-size: 28px; margin-bottom: 10px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { padding: 10px; border: 1px solid #ccc; text-align: left; }
-    input { width: 100%; padding: 5px; }
-    .results { margin-top: 30px; font-weight: bold; font-size: 18px; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dumpster Rental Profit Calculator</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background: #f8f9fa;
+    color: #333;
+  }
+  h1 {
+    text-align: center;
+    color: #004085;
+  }
+  label {
+    font-weight: bold;
+    display: block;
+    margin-top: 1rem;
+  }
+  input[type="number"] {
+    width: 100%;
+    padding: 0.4rem;
+    margin-top: 0.3rem;
+    font-size: 1rem;
+  }
+  .output {
+    background: #e9ecef;
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 6px;
+    font-size: 1.1rem;
+  }
+  .output div {
+    margin-bottom: 0.6rem;
+  }
+  .highlight {
+    font-weight: bold;
+    color: #155724;
+  }
+</style>
 </head>
 <body>
   <h1>Dumpster Rental Profit Calculator</h1>
 
-  <table>
-    <tr><th>Input</th><th>Value</th></tr>
-    <tr><td>Monthly Rentals</td><td><input type="number" id="rentals" value="20"></td></tr>
-    <tr><td>Rental Price ($)</td><td><input type="number" id="rentalPrice" value="299"></td></tr>
-    <tr><td>Fixed Cost per Rental (incl. $20 profit)</td><td><input type="number" id="fixedCost" value="261.90"></td></tr>
-    <tr><td>Avg Overage per Rental (lbs)</td><td><input type="number" id="overageLbs" value="500"></td></tr>
-    <tr><td>Overage Rate ($/lb)</td><td><input type="number" id="overageRate" value="0.03"></td></tr>
-    <tr><td>Appliance/TV/Tire Fee Revenue ($/month)</td><td><input type="number" id="extraFees" value="0"></td></tr>
-  </table>
+  <label for="rentals">Number of Rentals per Month</label>
+  <input type="number" id="rentals" min="0" value="20" />
 
-  <div class="results">
-    <p>Total Revenue: $<span id="totalRevenue">0</span></p>
-    <p>Total Cost: $<span id="totalCost">0</span></p>
-    <p>Total Profit: $<span id="totalProfit">0</span></p>
-    <p>Profit Per Rental: $<span id="profitPerRental">0</span></p>
+  <label for="price">Price per Rental ($)</label>
+  <input type="number" id="price" min="0" value="281" step="0.01" />
+
+  <label for="ownerDraw">Owner’s Draw per Rental ($)</label>
+  <input type="number" id="ownerDraw" min="0" value="70" step="0.01" />
+
+  <label for="businessProfit">Business Profit per Rental ($)</label>
+  <input type="number" id="businessProfit" min="0" value="20" step="0.01" />
+
+  <div class="output" id="results">
+    <div>Total Revenue: $<span id="totalRevenue">0</span></div>
+    <div>Total Owner’s Draw: $<span id="totalOwnerDraw">0</span></div>
+    <div>Total Business Profit: $<span id="totalBusinessProfit">0</span></div>
+    <div>Total Operating Costs: $<span id="totalCosts">0</span></div>
   </div>
 
-  <script>
-    function calculateProfit() {
-      const rentals = parseFloat(document.getElementById('rentals').value);
-      const rentalPrice = parseFloat(document.getElementById('rentalPrice').value);
-      const fixedCost = parseFloat(document.getElementById('fixedCost').value);
-      const overageLbs = parseFloat(document.getElementById('overageLbs').value);
-      const overageRate = parseFloat(document.getElementById('overageRate').value);
-      const extraFees = parseFloat(document.getElementById('extraFees').value);
+<script>
+  const rentalsInput = document.getElementById('rentals');
+  const priceInput = document.getElementById('price');
+  const ownerDrawInput = document.getElementById('ownerDraw');
+  const businessProfitInput = document.getElementById('businessProfit');
 
-      const overageIncomePerRental = overageLbs * overageRate;
-      const totalRevenue = rentals * (rentalPrice + overageIncomePerRental) + extraFees;
-      const totalCost = rentals * fixedCost;
-      const totalProfit = totalRevenue - totalCost;
-      const profitPerRental = totalProfit / rentals;
+  const totalRevenueEl = document.getElementById('totalRevenue');
+  const totalOwnerDrawEl = document.getElementById('totalOwnerDraw');
+  const totalBusinessProfitEl = document.getElementById('totalBusinessProfit');
+  const totalCostsEl = document.getElementById('totalCosts');
 
-      document.getElementById('totalRevenue').textContent = totalRevenue.toFixed(2);
-      document.getElementById('totalCost').textContent = totalCost.toFixed(2);
-      document.getElementById('totalProfit').textContent = totalProfit.toFixed(2);
-      document.getElementById('profitPerRental').textContent = profitPerRental.toFixed(2);
-    }
+  function calculate() {
+    const rentals = Number(rentalsInput.value);
+    const price = Number(priceInput.value);
+    const ownerDraw = Number(ownerDrawInput.value);
+    const businessProfit = Number(businessProfitInput.value);
 
-    document.querySelectorAll('input').forEach(input => {
-      input.addEventListener('input', calculateProfit);
-    });
+    const totalRevenue = rentals * price;
+    const totalOwnerDraw = rentals * ownerDraw;
+    const totalBusinessProfit = rentals * businessProfit;
+    const totalCosts = totalRevenue - totalOwnerDraw - totalBusinessProfit;
 
-    calculateProfit();
-  </script>
+    totalRevenueEl.textContent = totalRevenue.toFixed(2);
+    totalOwnerDrawEl.textContent = totalOwnerDraw.toFixed(2);
+    totalBusinessProfitEl.textContent = totalBusinessProfit.toFixed(2);
+    totalCostsEl.textContent = totalCosts.toFixed(2);
+  }
+
+  rentalsInput.addEventListener('input', calculate);
+  priceInput.addEventListener('input', calculate);
+  ownerDrawInput.addEventListener('input', calculate);
+  businessProfitInput.addEventListener('input', calculate);
+
+  // Initial calculation
+  calculate();
+</script>
 </body>
 </html>
