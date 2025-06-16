@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dumpster Rental Profit Calculator</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; background-color: #f9f9f9; }
+    h1 { font-size: 28px; margin-bottom: 10px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 10px; border: 1px solid #ccc; text-align: left; }
+    input { width: 100%; padding: 5px; }
+    .results { margin-top: 30px; font-weight: bold; font-size: 18px; }
+  </style>
+</head>
+<body>
+  <h1>Dumpster Rental Profit Calculator</h1>
+
+  <table>
+    <tr><th>Input</th><th>Value</th></tr>
+    <tr><td>Monthly Rentals</td><td><input type="number" id="rentals" value="20"></td></tr>
+    <tr><td>Rental Price ($)</td><td><input type="number" id="rentalPrice" value="299"></td></tr>
+    <tr><td>Fixed Cost per Rental (incl. $20 profit)</td><td><input type="number" id="fixedCost" value="261.90"></td></tr>
+    <tr><td>Avg Overage per Rental (lbs)</td><td><input type="number" id="overageLbs" value="500"></td></tr>
+    <tr><td>Overage Rate ($/lb)</td><td><input type="number" id="overageRate" value="0.03"></td></tr>
+    <tr><td>Appliance/TV/Tire Fee Revenue ($/month)</td><td><input type="number" id="extraFees" value="0"></td></tr>
+  </table>
+
+  <div class="results">
+    <p>Total Revenue: $<span id="totalRevenue">0</span></p>
+    <p>Total Cost: $<span id="totalCost">0</span></p>
+    <p>Total Profit: $<span id="totalProfit">0</span></p>
+    <p>Profit Per Rental: $<span id="profitPerRental">0</span></p>
+  </div>
+
+  <script>
+    function calculateProfit() {
+      const rentals = parseFloat(document.getElementById('rentals').value);
+      const rentalPrice = parseFloat(document.getElementById('rentalPrice').value);
+      const fixedCost = parseFloat(document.getElementById('fixedCost').value);
+      const overageLbs = parseFloat(document.getElementById('overageLbs').value);
+      const overageRate = parseFloat(document.getElementById('overageRate').value);
+      const extraFees = parseFloat(document.getElementById('extraFees').value);
+
+      const overageIncomePerRental = overageLbs * overageRate;
+      const totalRevenue = rentals * (rentalPrice + overageIncomePerRental) + extraFees;
+      const totalCost = rentals * fixedCost;
+      const totalProfit = totalRevenue - totalCost;
+      const profitPerRental = totalProfit / rentals;
+
+      document.getElementById('totalRevenue').textContent = totalRevenue.toFixed(2);
+      document.getElementById('totalCost').textContent = totalCost.toFixed(2);
+      document.getElementById('totalProfit').textContent = totalProfit.toFixed(2);
+      document.getElementById('profitPerRental').textContent = profitPerRental.toFixed(2);
+    }
+
+    document.querySelectorAll('input').forEach(input => {
+      input.addEventListener('input', calculateProfit);
+    });
+
+    calculateProfit();
+  </script>
+</body>
+</html>
